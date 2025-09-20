@@ -74,7 +74,7 @@ const LandingPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {languages.map((lang) => (
               <Link 
-                to="/dashboard" 
+                to="/login" 
                 key={lang.code} 
                 onClick={() => changeLanguage(lang.code)} 
                 className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 hover:border-white/50 rounded-xl p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg flex flex-col items-center space-y-2 text-center"

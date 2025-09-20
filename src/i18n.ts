@@ -83,6 +83,22 @@ i18n
             officer: 'Officer',
             admin: 'Admin',
             loginAs: 'Login as {{role}}'
+          },
+          login: {
+            selectRole: 'Select Your Role',
+            selectRoleDesc: 'Choose your login type to access the appropriate dashboard',
+            backToLanguage: 'Back to Language Selection',
+            backToRoles: 'Back to Role Selection',
+            username: 'Username / Badge ID',
+            password: 'Password',
+            signIn: 'Sign In as {{role}}',
+            forgotPassword: 'Forgot your password?',
+            citizenDesc: 'File complaints, track cases, access public services',
+            officerDesc: 'Manage cases, access officer tools, update investigations',
+            adminDesc: 'System administration, user management, analytics',
+            enterUsername: 'Enter Username',
+            enterBadgeId: 'Enter Badge ID',
+            enterPassword: 'Enter Password'
           }
         }
       },
@@ -156,6 +172,22 @@ i18n
             officer: 'अधिकारी',
             admin: 'व्यवस्थापक',
             loginAs: '{{role}} के रूप में लॉगिन करें'
+          },
+          login: {
+            selectRole: 'अपनी भूमिका चुनें',
+            selectRoleDesc: 'उपयुक्त डैशबोर्ड तक पहुंचने के लिए अपना लॉगिन प्रकार चुनें',
+            backToLanguage: 'भाषा चयन पर वापस जाएं',
+            backToRoles: 'भूमिका चयन पर वापस जाएं',
+            username: 'उपयोगकर्ता नाम / बैज आईडी',
+            password: 'पासवर्ड',
+            signIn: '{{role}} के रूप में साइन इन करें',
+            forgotPassword: 'अपना पासवर्ड भूल गए?',
+            citizenDesc: 'शिकायत दर्ज करें, मामलों को ट्रैक करें, सार्वजनिक सेवाओं तक पहुंचें',
+            officerDesc: 'मामलों का प्रबंधन करें, अधिकारी उपकरणों तक पहुंचें, जांच अपडेट करें',
+            adminDesc: 'सिस्टम प्रशासन, उपयोगकर्ता प्रबंधन, एनालिटिक्स',
+            enterUsername: 'उपयोगकर्ता नाम दर्ज करें',
+            enterBadgeId: 'बैज आईडी दर्ज करें',
+            enterPassword: 'पासवर्ड दर्ज करें'
           }
         }
       },
@@ -229,6 +261,22 @@ i18n
             officer: 'अधिकारी',
             admin: 'प्रशासक',
             loginAs: '{{role}} म्हणून लॉगिन करा'
+          },
+          login: {
+            selectRole: 'तुमची भूमिका निवडा',
+            selectRoleDesc: 'योग्य डॅशबोर्डवर प्रवेश करण्यासाठी तुमचा लॉगिन प्रकार निवडा',
+            backToLanguage: 'भाषा निवडीवर परत जा',
+            backToRoles: 'भूमिका निवडीवर परत जा',
+            username: 'वापरकर्ता नाव / बॅज आयडी',
+            password: 'पासवर्ड',
+            signIn: '{{role}} म्हणून साइन इन करा',
+            forgotPassword: 'तुमचा पासवर्ड विसरलात?',
+            citizenDesc: 'तक्रारी दाखल करा, प्रकरणे ट्रॅक करा, सार्वजनिक सेवांमध्ये प्रवेश मिळवा',
+            officerDesc: 'प्रकरणे व्यवस्थापित करा, अधिकारी साधनांमध्ये प्रवेश मिळवा, तपास अपडेट करा',
+            adminDesc: 'सिस्टम प्रशासन, वापरकर्ता व्यवस्थापन, अॅनालिटिक्स',
+            enterUsername: 'वापरकर्ता नाव प्रविष्ट करा',
+            enterBadgeId: 'बॅज आयडी प्रविष्ट करा',
+            enterPassword: 'पासवर्ड प्रविष्ट करा'
           }
         }
       },
@@ -302,6 +350,22 @@ i18n
             officer: 'अधिकारी',
             admin: 'प्रशासक',
             loginAs: '{{role}} म्हूण लॉगिन करात'
+          },
+          login: {
+            selectRole: 'तुमची भूमिका निवडात',
+            selectRoleDesc: 'योग्य डॅशबोर्डांत प्रवेश करपाक तुमचो लॉगिन प्रकार निवडात',
+            backToLanguage: 'भाषा निवडणेंत परत वचात',
+            backToRoles: 'भूमिका निवडणेंत परत वचात',
+            username: 'वापरप्यांचें नांव / बॅज आयडी',
+            password: 'पासवर्ड',
+            signIn: '{{role}} म्हूण साइन इन करात',
+            forgotPassword: 'तुमचो पासवर्ड विसरलात?',
+            citizenDesc: 'तक्रारी दाखल करात, प्रकरणां ट्रॅक करात, सार्वजनिक सेवांनी प्रवेश घेयात',
+            officerDesc: 'प्रकरणां व्यवस्थापित करात, अधिकारी साधनांनी प्रवेश घेयात, तपास अपडेट करात',
+            adminDesc: 'सिस्टम प्रशासन, वापरप्यांचो व्यवस्थापन, अॅनालिटिक्स',
+            enterUsername: 'वापरप्यांचें नांव भरात',
+            enterBadgeId: 'बॅज आयडी भरात',
+            enterPassword: 'पासवर्ड भरात'
           }
         }
       },
@@ -375,6 +439,22 @@ i18n
             officer: 'ಅಧಿಕಾರಿ',
             admin: 'ನಿರ್ವಾಹಕ',
             loginAs: '{{role}} ಆಗಿ ಲಾಗಿನ್ ಮಾಡಿ'
+          },
+          login: {
+            selectRole: 'ನಿಮ್ಮ ಭೂಮಿಕೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+            selectRoleDesc: 'ಯೋಗ್ಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಪ್ರವೇಶಿಸಲು ನಿಮ್ಮ ಲಾಗಿನ್ ಪ್ರಕಾರವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+            backToLanguage: 'ಭಾಷೆ ಆಯ್ಕೆಗೆ ವಾಪಸು ಹೋಗಿ',
+            backToRoles: 'ಭೂಮಿಕೆ ಆಯ್ಕೆಗೆ ವಾಪಸು ಹೋಗಿ',
+            username: 'ವಾಪರಕರ್ತ ಹೆಸರು / ಬ್ಯಾಜ್ ಆಈಡಿ',
+            password: 'ಪಾಸ್ವರ್ಡ್',
+            signIn: '{{role}} ಆಗಿ ಸೈನ್ ಇನ್ ಮಾಡಿ',
+            forgotPassword: 'ನಿಮ್ಮ ಪಾಸ್ವರ್ಡ್ ಮರೆತಿದ್ದೀರಿ?',
+            citizenDesc: 'ದೂರುಗಳನ್ನು ದಾಖಲಿಸಿ, ಪ್ರಕರಣಗಳನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ, ಸಾರ್ವಜನಿಕ ಸೇವೆಗಳನ್ನು ವೀಕ್ಷಿಸಿ',
+            officerDesc: 'ಪ್ರಕರಣಗಳನ್ನು ನಿರ್ವಹಿಸಿ, ಅಧಿಕಾರಿ ಸಾಧನಗಳನ್ನು ಬೇರೆ, ತನಿಖೆಯನ್ನು ಅಪ್ಡೇಟ್ ಮಾಡಿ',
+            adminDesc: 'ಸಿಸ್ಟಂ ಪ್ರಶಾಸನ, ವಾಪರಕರ್ತ ನಿರ್ವಹಣೆ, ಅನ್ಯಾಲಿಟಿಕ್ಸ್',
+            enterUsername: 'ವಾಪರಕರ್ತ ಹೆಸರು ನಮೂದಿಸಿ',
+            enterBadgeId: 'ಬ್ಯಾಜ್ ಆಈಡಿ ನಮೂದಿಸಿ',
+            enterPassword: 'ಪಾಸ್ವರ್ಡ್ ನಮೂದಿಸಿ'
           }
         }
       },
@@ -448,6 +528,22 @@ i18n
             officer: 'Officier',
             admin: 'Administrateur',
             loginAs: 'Se connecter en tant que {{role}}'
+          },
+          login: {
+            selectRole: 'Sélectionnez Votre Rôle',
+            selectRoleDesc: 'Choisissez votre type de connexion pour accéder au tableau de bord approprié',
+            backToLanguage: 'Retour à la Sélection de Langue',
+            backToRoles: 'Retour à la Sélection de Rôle',
+            username: 'Nom d\'utilisateur / ID Badge',
+            password: 'Mot de passe',
+            signIn: 'Se connecter en tant que {{role}}',
+            forgotPassword: 'Mot de passe oublié?',
+            citizenDesc: 'Déposer des plaintes, suivre les affaires, accéder aux services publics',
+            officerDesc: 'Gérer les affaires, accéder aux outils d\'officier, mettre à jour les enquêtes',
+            adminDesc: 'Administration système, gestion des utilisateurs, analytiques',
+            enterUsername: 'Entrez le nom d\'utilisateur',
+            enterBadgeId: 'Entrez l\'ID du badge',
+            enterPassword: 'Entrez le mot de passe'
           }
         }
       },
@@ -521,6 +617,22 @@ i18n
             officer: 'Beamter',
             admin: 'Administrator',
             loginAs: 'Als {{role}} anmelden'
+          },
+          login: {
+            selectRole: 'Wählen Sie Ihre Rolle',
+            selectRoleDesc: 'Wählen Sie Ihren Anmeldetyp, um auf das entsprechende Dashboard zuzugreifen',
+            backToLanguage: 'Zurück zur Sprachauswahl',
+            backToRoles: 'Zurück zur Rollenauswahl',
+            username: 'Benutzername / Dienstausweis-ID',
+            password: 'Passwort',
+            signIn: 'Als {{role}} anmelden',
+            forgotPassword: 'Passwort vergessen?',
+            citizenDesc: 'Beschwerden einreichen, Fälle verfolgen, auf öffentliche Dienste zugreifen',
+            officerDesc: 'Fälle verwalten, auf Beamten-Tools zugreifen, Ermittlungen aktualisieren',
+            adminDesc: 'Systemverwaltung, Benutzerverwaltung, Analytik',
+            enterUsername: 'Benutzername eingeben',
+            enterBadgeId: 'Dienstausweis-ID eingeben',
+            enterPassword: 'Passwort eingeben'
           }
         }
       },
@@ -594,6 +706,22 @@ i18n
             officer: 'Офицер',
             admin: 'Администратор',
             loginAs: 'Войти как {{role}}'
+          },
+          login: {
+            selectRole: 'Выберите Вашу Роль',
+            selectRoleDesc: 'Выберите тип входа для доступа к соответствующей панели',
+            backToLanguage: 'Назад к выбору языка',
+            backToRoles: 'Назад к выбору роли',
+            username: 'Имя пользователя / ID бейджа',
+            password: 'Пароль',
+            signIn: 'Войти как {{role}}',
+            forgotPassword: 'Забыли пароль?',
+            citizenDesc: 'Подавать жалобы, отслеживать дела, получать доступ к госуслугам',
+            officerDesc: 'Управлять делами, использовать инструменты офицера, обновлять расследования',
+            adminDesc: 'Администрирование системы, управление пользователями, аналитика',
+            enterUsername: 'Введите имя пользователя',
+            enterBadgeId: 'Введите ID бейджа',
+            enterPassword: 'Введите пароль'
           }
         }
       }

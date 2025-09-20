@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Role-Based Test Users</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .user-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007cba;
+        }
+        .user-card.citizen { border-left-color: #007cba; }
+        .user-card.officer { border-left-color: #28a745; }
+        .user-card.admin { border-left-color: #6f42c1; }
+        .button {
+            background: #007cba;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background: #005a87;
+        }
+        .button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .output {
+            background: #000;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-left: 8px;
+        }
+        .role-badge.citizen { background: #007cba; }
+        .role-badge.officer { background: #28a745; }
+        .role-badge.admin { background: #6f42c1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Create Role-Based Test Users</h1>
+        
+        <p>This will create test users for each role to properly test role-based authentication:</p>
+
+        <div class="user-grid">
+            <div class="user-card citizen">
+                <h3>👤 Citizens <span class="role-badge citizen">CITIZEN</span></h3>
+                <ul>
+                    <li><strong>John Citizen</strong><br>john.citizen@example.com / citizen123</li>
+                    <li><strong>Jane Public</strong><br>jane.public@example.com / citizen456</li>
+                </ul>
+            </div>
+
+            <div class="user-card officer">
+                <h3>🛡️ Officers <span class="role-badge officer">OFFICER</span></h3>
+                <ul>
+                    <li><strong>Officer Smith</strong><br>smith.officer@police.gov / officer123</li>
+                    <li><strong>Officer Jones</strong><br>jones.officer@police.gov / officer456</li>
+                </ul>
+            </div>
+
+            <div class="user-card admin">
+                <h3>⚙️ Admins <span class="role-badge admin">ADMIN</span></h3>
+                <ul>
+                    <li><strong>Admin Kumar</strong><br>admin.kumar@police.gov / admin123</li>
+                    <li><strong>Admin Patel</strong><br>admin.patel@police.gov / admin456</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <button class="button" onclick="createRoleBasedUsers()">👥 Create All Role-Based Users</button>
+            <button class="button" onclick="testRoleValidation()">🧪 Test Role Validation</button>
+            <button class="button" onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+
+        <div class="output" id="output">Click "Create All Role-Based Users" to start...</div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://azmnwvvyhantiefqeayp.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6bW53dnZ5aGFudGllZnFlYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzNDc4ODUsImV4cCI6MjA3MzkyMzg4NX0.Jt1EhhATr1GRNo7hyV_66jl3KWAwUGc6qJi1YZ4QtXY'
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        const testUsers = [
+            // Citizens
+            { 
+                firstName: 'John', 
+                lastName: 'Citizen', 
+                email: 'john.citizen@example.com', 
+                password: 'citizen123', 
+                role: 'citizen' 
+            },
+            { 
+                firstName: 'Jane', 
+                lastName: 'Public', 
+                email: 'jane.public@example.com', 
+                password: 'citizen456', 
+                role: 'citizen' 
+            },
+            // Officers
+            { 
+                firstName: 'Officer', 
+                lastName: 'Smith', 
+                email: 'smith.officer@police.gov', 
+                password: 'officer123', 
+                role: 'officer' 
+            },
+            { 
+                firstName: 'Officer', 
+                lastName: 'Jones', 
+                email: 'jones.officer@police.gov', 
+                password: 'officer456', 
+                role: 'officer' 
+            },
+            // Admins
+            { 
+                firstName: 'Admin', 
+                lastName: 'Kumar', 
+                email: 'admin.kumar@police.gov', 
+                password: 'admin123', 
+                role: 'admin' 
+            },
+            { 
+                firstName: 'Admin', 
+                lastName: 'Patel', 
+                email: 'admin.patel@police.gov', 
+                password: 'admin456', 
+                role: 'admin' 
+            }
+        ]
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('output')
+            const timestamp = new Date().toLocaleTimeString()
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️'
+            output.textContent += `[${timestamp}] ${prefix} ${message}\n`
+            output.scrollTop = output.scrollHeight
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = ''
+        }
+
+        async function createRoleBasedUsers() {
+            log('🚀 Creating role-based test users...')
+            log('=' .repeat(50))
+            
+            for (const userData of testUsers) {
+                try {
+                    log(`👤 Creating ${userData.role}: ${userData.firstName} ${userData.lastName}`)
+                    
+                    const { data, error } = await supabase.auth.signUp({
+                        email: userData.email,
+                        password: userData.password,
+                        options: {
+                            data: {
+                                first_name: userData.firstName,
+                                last_name: userData.lastName,
+                                full_name: `${userData.firstName} ${userData.lastName}`,
+                                role: userData.role,
+                                display_name: `${userData.firstName} ${userData.lastName}`
+                            }
+                        }
+                    })
+                    
+                    if (error) {
+                        if (error.message.includes('User already registered')) {
+                            log(`⚠️  ${userData.firstName} ${userData.lastName}: Already exists`, 'info')
+                        } else {
+                            log(`❌ ${userData.firstName} ${userData.lastName}: ${error.message}`, 'error')
+                        }
+                    } else if (data.user) {
+                        log(`✅ ${userData.firstName} ${userData.lastName} created successfully!`, 'success')
+                        log(`   📧 Email: ${userData.email}`)
+                        log(`   👥 Role: ${userData.role}`)
+                        log(`   🆔 User ID: ${data.user.id}`)
+                    }
+                    
+                    // Wait between requests to avoid rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 1500))
+                    
+                } catch (err) {
+                    log(`❌ Error creating ${userData.firstName} ${userData.lastName}: ${err.message}`, 'error')
+                }
+            }
+            
+            log('=' .repeat(50))
+            log('🎉 User creation completed!')
+            log('🔗 Check your Supabase dashboard:')
+            log('   https://supabase.com/dashboard/project/azmnwvvyhantiefqeayp/auth/users')
+            log('')
+            log('📋 Test Credentials Summary:')
+            log('CITIZENS:')
+            log('  • john.citizen@example.com / citizen123')
+            log('  • jane.public@example.com / citizen456')
+            log('OFFICERS:')
+            log('  • smith.officer@police.gov / officer123')
+            log('  • jones.officer@police.gov / officer456')
+            log('ADMINS:')
+            log('  • admin.kumar@police.gov / admin123')
+            log('  • admin.patel@police.gov / admin456')
+        }
+
+        async function testRoleValidation() {
+            log('\n🧪 Testing role-based authentication...')
+            log('=' .repeat(50))
+            
+            // Test cases: trying to login with wrong role
+            const testCases = [
+                {
+                    description: 'Citizen trying to login as Officer (should fail)',
+                    email: 'john.citizen@example.com',
+                    password: 'citizen123',
+                    expectedRole: 'citizen',
+                    attemptRole: 'officer'
+                },
+                {
+                    description: 'Officer trying to login as Admin (should fail)',
+                    email: 'smith.officer@police.gov',
+                    password: 'officer123',
+                    expectedRole: 'officer',
+                    attemptRole: 'admin'
+                },
+                {
+                    description: 'Admin logging in as Admin (should succeed)',
+                    email: 'admin.kumar@police.gov',
+                    password: 'admin123',
+                    expectedRole: 'admin',
+                    attemptRole: 'admin'
+                }
+            ]
+            
+            for (const testCase of testCases) {
+                try {
+                    log(`\n🔍 ${testCase.description}`)
+                    log(`📧 Email: ${testCase.email}`)
+                    log(`🎭 User role: ${testCase.expectedRole}`)
+                    log(`🎯 Attempting login as: ${testCase.attemptRole}`)
+                    
+                    const { data, error } = await supabase.auth.signInWithPassword({
+                        email: testCase.email,
+                        password: testCase.password
+                    })
+                    
+                    if (error) {
+                        log(`❌ Login failed: ${error.message}`, 'error')
+                    } else if (data.user) {
+                        const userRole = data.user.user_metadata?.role
+                        log(`✅ Authentication successful`, 'success')
+                        log(`👤 User role in database: ${userRole}`)
+                        
+                        if (userRole === testCase.attemptRole) {
+                            log(`✅ Role validation: SUCCESS - User can login as ${testCase.attemptRole}`, 'success')
+                        } else {
+                            log(`❌ Role validation: FAIL - User is ${userRole} but trying to login as ${testCase.attemptRole}`, 'error')
+                            log(`🔒 In your app, this should be rejected!`)
+                        }
+                        
+                        // Sign out after test
+                        await supabase.auth.signOut()
+                        log(`🚪 Signed out for next test`)
+                    }
+                    
+                } catch (err) {
+                    log(`❌ Test error: ${err.message}`, 'error')
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+            
+            log('\n✅ Role validation testing completed!')
+            log('💡 Remember: Your login component should check user role and reject mismatched attempts')
+        }
+
+        // Test connection on page load
+        window.addEventListener('load', () => {
+            log('🚀 Role-based user creation tool loaded')
+            log('💡 This will create users with specific roles for testing')
+        })
+    </script>
+</body>
+</html>
