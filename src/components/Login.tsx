@@ -230,8 +230,17 @@ const Login = () => {
         localStorage.setItem('userEmail', data.user.email || '');
         localStorage.setItem('userName', data.user.user_metadata?.full_name || '');
         
-        // Redirect to role demo to show role-based authentication working
-        navigate('/role-demo');
+        // Redirect based on role
+        if (userRole === 'officer') {
+          navigate('/officer-dashboard');
+        } else if (userRole === 'admin') {
+          navigate('/admin-dashboard');
+        } else if (userRole === 'citizen') {
+          navigate('/citizen-dashboard');
+        } else {
+          // Fallback to role demo
+          navigate('/role-demo');
+        }
       } else {
         throw new Error('Login failed - no user returned');
       }

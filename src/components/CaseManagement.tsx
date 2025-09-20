@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -13,105 +13,178 @@ import {
   CheckCircle,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Loader2,
+  UserCheck
 } from 'lucide-react';
+import { loadFIRData, filterCases, deleteCase, transferCase, CaseData } from '../lib/firData';
+import { useAuth } from '../lib/useAuth';
+import CaseDetailView from './CaseDetailView';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import TransferCaseModal from './TransferCaseModal';
+import CaseVerification from './CaseVerification';
 
 const CaseManagement: React.FC = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [cases, setCases] = useState<CaseData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCase, setSelectedCase] = useState<CaseData | null>(null);
+  const [verificationCase, setVerificationCase] = useState<CaseData | null>(null);
+  
+  // Delete modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [caseToDelete, setCaseToDelete] = useState<CaseData | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const cases = [
-    {
-      id: 'FIR001',
-      type: 'Theft',
-      status: 'Under Investigation',
-      priority: 'High',
-      complainant: 'Rajesh Kumar',
-      location: 'Market Street, Panaji',
-      date: '2024-01-15',
-      assignedTo: 'Officer Singh',
-      description: 'Bicycle stolen from parking area near the market',
-      progress: 65,
-      lastUpdate: '2 hours ago'
-    },
-    {
-      id: 'FIR002',
-      type: 'Domestic Dispute',
-      status: 'Resolved',
-      priority: 'Medium',
-      complainant: 'Priya Sharma',
-      location: 'Residential Area, Margao',
-      date: '2024-01-14',
-      assignedTo: 'Officer Patel',
-      description: 'Noise complaint from neighbors',
-      progress: 100,
-      lastUpdate: '1 day ago'
-    },
-    {
-      id: 'FIR003',
-      type: 'Cybercrime',
-      status: 'Pending',
-      priority: 'High',
-      complainant: 'Amit Desai',
-      location: 'Online',
-      date: '2024-01-16',
-      assignedTo: 'Officer Kumar',
-      description: 'Online fraud - fake investment scheme',
-      progress: 20,
-      lastUpdate: '30 minutes ago'
-    },
-    {
-      id: 'FIR004',
-      type: 'Traffic Violation',
-      status: 'Under Investigation',
-      priority: 'Low',
-      complainant: 'Maria Fernandes',
-      location: 'Highway NH-66',
-      date: '2024-01-17',
-      assignedTo: 'Officer D\'Souza',
-      description: 'Reckless driving and overspeeding',
-      progress: 40,
-      lastUpdate: '4 hours ago'
-    },
-    {
-      id: 'FIR005',
-      type: 'Missing Person',
-      status: 'Under Investigation',
-      priority: 'High',
-      complainant: 'Sunita Naik',
-      location: 'Vasco da Gama',
-      date: '2024-01-18',
-      assignedTo: 'Officer Singh',
-      description: 'Teenage daughter missing since yesterday',
-      progress: 30,
-      lastUpdate: '1 hour ago'
-    },
-    {
-      id: 'FIR006',
-      type: 'Fraud',
-      status: 'Resolved',
-      priority: 'Medium',
-      complainant: 'Carlos Pereira',
-      location: 'Calangute',
-      date: '2024-01-12',
-      assignedTo: 'Officer Patel',
-      description: 'Credit card fraud at local restaurant',
-      progress: 100,
-      lastUpdate: '3 days ago'
+  // Transfer modal state
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
+  const [caseToTransfer, setCaseToTransfer] = useState<CaseData | null>(null);
+
+  // Load cases on component mount
+  useEffect(() => {
+    const loadCases = async () => {
+      try {
+        setLoading(true);
+        
+        // Get current officer name from auth context
+        const currentOfficer = user?.fullName || user?.email?.split('@')[0];
+        console.log('👮 Current officer from auth:', currentOfficer);
+        console.log('📧 User email:', user?.email);
+        console.log('👤 User fullName:', user?.fullName);
+        
+        // Load cases assigned to current officer only
+        const firCases = await loadFIRData(currentOfficer);
+        setCases(firCases);
+        setError(null);
+        
+        console.log(`📊 Loaded ${firCases.length} cases for officer: ${currentOfficer}`);
+        // Log the assigned officers of loaded cases for debugging
+        if (firCases.length > 0) {
+          console.log('👮‍♂️ Assigned officers in loaded cases:', firCases.map(c => c.assignedTo));
+        }
+      } catch (err) {
+        setError('Failed to load cases. Please try again later.');
+        console.error('Error loading cases:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Only load cases if user is available
+    if (user) {
+      loadCases();
     }
-  ];
+  }, [user]);
 
-  const filteredCases = cases.filter(case_ => {
-    const matchesSearch = case_.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         case_.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         case_.complainant.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || case_.status === filterStatus;
-    const matchesPriority = filterPriority === 'all' || case_.priority === filterPriority;
-    
-    return matchesSearch && matchesStatus && matchesPriority;
-  });
+  // Auto-hide success message after 5 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  const filteredCases = filterCases(cases, searchTerm, filterStatus, filterPriority);
+
+  const handleViewCase = (caseData: CaseData) => {
+    setSelectedCase(caseData);
+  };
+
+  const handleBackToList = () => {
+    setSelectedCase(null);
+    setVerificationCase(null);
+  };
+
+  const handleVerifyCase = (caseData: CaseData) => {
+    setVerificationCase(caseData);
+    setSelectedCase(null);
+  };
+
+  const handleDeleteClick = (caseData: CaseData) => {
+    setCaseToDelete(caseData);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async (reason: string) => {
+    if (!caseToDelete) return;
+
+    try {
+      // Call the delete function
+      await deleteCase(caseToDelete.id, reason);
+      
+      // Remove the case from the local state
+      setCases(prevCases => prevCases.filter(c => c.id !== caseToDelete.id));
+      
+      // Show success message
+      setSuccessMessage(`Case ${caseToDelete.id} has been successfully deleted.`);
+      
+      // Close modal and reset state
+      setDeleteModalOpen(false);
+      setCaseToDelete(null);
+      
+    } catch (err) {
+      console.error('Error deleting case:', err);
+      throw err; // Re-throw to let the modal handle the error
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+    setCaseToDelete(null);
+  };
+
+  const handleTransferClick = (caseData: CaseData) => {
+    setCaseToTransfer(caseData);
+    setTransferModalOpen(true);
+  };
+
+  const handleTransferConfirm = async (newOfficer: string, reason: string) => {
+    if (!caseToTransfer) return;
+
+    try {
+      // Get current officer name for transfer logging
+      const currentOfficer = user?.fullName || user?.email?.split('@')[0] || 'Unknown Officer';
+      
+      // Call the transfer function
+      await transferCase(caseToTransfer.id, newOfficer, reason, currentOfficer);
+      
+      // Remove the case from the local state since it's no longer assigned to current officer
+      setCases(prevCases => prevCases.filter(c => c.id !== caseToTransfer.id));
+      
+      // Show success message
+      setSuccessMessage(`Case ${caseToTransfer.id} has been successfully transferred to ${newOfficer}.`);
+      
+      // Close modal and reset state
+      setTransferModalOpen(false);
+      setCaseToTransfer(null);
+      
+    } catch (err) {
+      console.error('Error transferring case:', err);
+      throw err; // Re-throw to let the modal handle the error
+    }
+  };
+
+  const handleTransferCancel = () => {
+    setTransferModalOpen(false);
+    setCaseToTransfer(null);
+  };
+
+  // Show verification view if a case is being verified
+  if (verificationCase) {
+    return <CaseVerification caseData={verificationCase} onBack={handleBackToList} />;
+  }
+
+  // Show detailed view if a case is selected
+  if (selectedCase) {
+    return <CaseDetailView caseData={selectedCase} onBack={handleBackToList} onVerify={handleVerifyCase} />;
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -202,12 +275,28 @@ const CaseManagement: React.FC = () => {
 
             {/* Actions */}
             <div className="flex space-x-2">
-              <button className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-1">
+              <button 
+                onClick={() => handleViewCase(case_)}
+                className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-1"
+              >
                 <Eye className="w-4 h-4" />
                 <span>View</span>
               </button>
               <button className="px-3 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors duration-200">
                 <Edit className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => handleTransferClick(case_)}
+                className="px-3 py-2 border border-blue-300 text-blue-700 text-sm rounded-lg hover:bg-blue-50 transition-colors duration-200"
+                title="Transfer Case"
+              >
+                <UserCheck className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => handleDeleteClick(case_)}
+                className="px-3 py-2 border border-red-300 text-red-700 text-sm rounded-lg hover:bg-red-50 transition-colors duration-200"
+              >
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -295,13 +384,29 @@ const CaseManagement: React.FC = () => {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900">
+                    <button 
+                      onClick={() => handleViewCase(case_)}
+                      className="text-blue-600 hover:text-blue-900"
+                      title="View Case"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="text-green-600 hover:text-green-900">
+                    <button className="text-green-600 hover:text-green-900" title="Edit Case">
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="text-red-600 hover:text-red-900">
+                    <button 
+                      onClick={() => handleTransferClick(case_)}
+                      className="text-blue-600 hover:text-blue-900"
+                      title="Transfer Case"
+                    >
+                      <UserCheck className="w-4 h-4" />
+                    </button>
+                    {/* Fixed delete button */}
+                    <button 
+                      onClick={() => handleDeleteClick(case_)}
+                      className="text-red-600 hover:text-red-900"
+                      title="Delete Case"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -319,11 +424,55 @@ const CaseManagement: React.FC = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Case Management</h1>
-        <p className="text-gray-600">Manage and track all cases in the system</p>
+        <div className="flex items-center justify-between">
+          <p className="text-gray-600">
+            Cases assigned to: <span className="font-semibold text-blue-600">
+              {user?.fullName || user?.email?.split('@')[0] || 'Current Officer'}
+            </span>
+          </p>
+          {!loading && !error && (
+            <div className="text-sm text-gray-500">
+              Showing {filteredCases.length} of {cases.length} assigned cases
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Controls */}
-      <div className="mb-6 space-y-4">
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <span className="ml-2 text-gray-600">Loading cases...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-5 h-5 text-red-600" />
+            <span className="text-red-700 font-medium">Error</span>
+          </div>
+          <p className="text-red-600 mt-1">{error}</p>
+        </div>
+      )}
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center space-x-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <span className="text-green-700 font-medium">Success</span>
+          </div>
+          <p className="text-green-600 mt-1">{successMessage}</p>
+        </div>
+      )}
+
+      {/* Main Content - Only show when not loading and no error */}
+      {!loading && !error && (
+        <>
+          {/* Controls */}
+          <div className="mb-6 space-y-4">
         {/* Search and Actions */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
@@ -405,24 +554,46 @@ const CaseManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Results Count */}
-      <div className="mb-4">
-        <p className="text-sm text-gray-600">
-          Showing {filteredCases.length} of {cases.length} cases
-        </p>
-      </div>
-
       {/* Cases Display */}
       {viewMode === 'grid' ? renderGridView() : renderListView()}
 
       {/* Empty State */}
-      {filteredCases.length === 0 && (
+      {filteredCases.length === 0 && !loading && !error && (
         <div className="text-center py-12">
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No cases found</h3>
-          <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            {cases.length === 0 ? 'No cases assigned' : 'No cases found'}
+          </h3>
+          <p className="text-gray-600">
+            {cases.length === 0 
+              ? 'You currently have no cases assigned to you.'
+              : 'Try adjusting your search or filter criteria'
+            }
+          </p>
         </div>
       )}
+        </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        caseId={caseToDelete?.id || ''}
+        caseType={caseToDelete?.type || ''}
+        complainantName={caseToDelete?.complainant || ''}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
+
+      {/* Transfer Case Modal */}
+      <TransferCaseModal
+        isOpen={transferModalOpen}
+        caseId={caseToTransfer?.id || ''}
+        caseType={caseToTransfer?.type || ''}
+        currentOfficer={caseToTransfer?.assignedTo || ''}
+        onConfirm={handleTransferConfirm}
+        onCancel={handleTransferCancel}
+      />
     </div>
   );
 };

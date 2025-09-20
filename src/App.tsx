@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Home from './Home';
+import OfficerDashboard from './components/OfficerDashboard';
 import ChatbotAvatarDemo from './components/ChatbotAvatarDemo';
 import SimpleAvatarTest from './components/SimpleAvatarTest';
 import BasicTest from './components/BasicTest';
@@ -20,6 +21,21 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
+        <Route path="/officer-dashboard" element={
+          <ProtectedRoute requiredRole="officer">
+            <OfficerDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin-dashboard" element={
+          <ProtectedRoute requiredRole="admin">
+            <Home />
+          </ProtectedRoute>
+        } />
+        <Route path="/citizen-dashboard" element={
+          <ProtectedRoute requiredRole="citizen">
             <Home />
           </ProtectedRoute>
         } />

@@ -8,7 +8,17 @@ import {
   TrendingUp,
   Shield,
   Bot,
-  ArrowRight
+  ArrowRight,
+  Users,
+  Calendar,
+  MapPin,
+  BarChart3,
+  Activity,
+  PlusCircle,
+  Search,
+  Filter,
+  Bell,
+  Star
 } from 'lucide-react';
 import { UserRole, ActiveView } from '../Home';
 
@@ -66,139 +76,205 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole: _userRole, setActiveVie
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {t('dashboard.title')}
-        </h1>
-        <p className="text-gray-600">
-          {t('dashboard.welcome')}
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => {
-          const IconComponent = stat.icon;
-          return (
-            <div key={index} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 bg-${stat.color}-100 rounded-lg flex items-center justify-center`}>
-                  <IconComponent className={`w-6 h-6 text-${stat.color}-600`} />
-                </div>
-                <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                  stat.change.startsWith('+') 
-                    ? 'bg-green-100 text-green-600' 
-                    : 'bg-red-100 text-red-600'
-                }`}>
-                  {stat.change}
-                </span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
-              <p className="text-gray-600 text-sm">{stat.label}</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="container mx-auto px-4 py-6">
+        {/* Modern Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                {t('dashboard.title')}
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Welcome back! Here's what's happening today.
+              </p>
             </div>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Quick Actions */}
-        <div className="lg:col-span-2">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">{t('dashboard.quickActions')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {quickActions.map((action, index) => {
-              const IconComponent = action.icon;
-              return (
-                <button
-                  key={index}
-                  onClick={action.action}
-                  className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-left group"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 bg-${action.color}-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      <IconComponent className={`w-6 h-6 text-${action.color}-600`} />
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{action.title}</h3>
-                  <p className="text-gray-600 text-sm">{action.description}</p>
-                </button>
-              );
-            })}
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Bell className="w-6 h-6 text-gray-600 hover:text-blue-600 cursor-pointer transition-colors" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              </div>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Recent Cases */}
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-6">{t('dashboard.recentCases')}</h2>
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100">
-            <div className="p-6">
-              <div className="space-y-4">
-                {recentCases.map((case_, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-semibold text-gray-900">{case_.id}</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          case_.priority === t('cases.high') 
-                            ? 'bg-red-100 text-red-600'
-                            : case_.priority === t('cases.medium')
-                            ? 'bg-yellow-100 text-yellow-600'
-                            : 'bg-green-100 text-green-600'
-                        }`}>
-                          {case_.priority}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-1">{case_.type}</p>
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          case_.status === t('cases.resolved')
-                            ? 'bg-green-100 text-green-600'
-                            : case_.status === t('cases.underInvestigation')
-                            ? 'bg-blue-100 text-blue-600'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {case_.status}
-                        </span>
-                        <span className="text-xs text-gray-500">{case_.time}</span>
-                      </div>
+        {/* Modern Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, index) => {
+            const IconComponent = stat.icon;
+            return (
+              <div key={index} className="group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg"></div>
+                <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-14 h-14 bg-gradient-to-br from-${stat.color}-400 to-${stat.color}-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <IconComponent className="w-7 h-7 text-white" />
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-sm font-bold ${
+                      stat.change.startsWith('+') 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-red-100 text-red-700'
+                    }`}>
+                      {stat.change}
                     </div>
                   </div>
-                ))}
+                  <h3 className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</h3>
+                  <p className="text-gray-600 font-medium">{stat.label}</p>
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-transparent to-gray-100/20 rounded-full transform translate-x-8 -translate-y-8"></div>
+                </div>
               </div>
-              <button 
-                onClick={() => setActiveView('cases')}
-                className="w-full mt-4 text-center text-blue-600 hover:text-blue-700 font-medium text-sm py-2 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-              >
-                {t('dashboard.viewAllCases')}
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Enhanced Quick Actions */}
+          <div className="lg:col-span-2">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{t('dashboard.quickActions')}</h2>
+              <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium">
+                <PlusCircle className="w-5 h-5" />
+                <span>Add New</span>
               </button>
             </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {quickActions.map((action, index) => {
+                const IconComponent = action.icon;
+                return (
+                  <button
+                    key={index}
+                    onClick={action.action}
+                    className="group relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg"></div>
+                    <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-left">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className={`w-12 h-12 bg-gradient-to-br from-${action.color}-400 to-${action.color}-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                          <IconComponent className="w-6 h-6 text-white" />
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">{action.title}</h3>
+                      <p className="text-gray-600 text-sm leading-relaxed">{action.description}</p>
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-transparent to-gray-100/20 rounded-full transform translate-x-8 -translate-y-8"></div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* System Status */}
-      <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-          <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.systemStatus')}</h3>
+          {/* Modern Recent Cases */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{t('dashboard.recentCases')}</h2>
+              <div className="flex items-center space-x-2">
+                <Search className="w-5 h-5 text-gray-400" />
+                <Filter className="w-5 h-5 text-gray-400" />
+              </div>
+            </div>
+            
+            <div className="relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg"></div>
+              <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl border border-white/50">
+                <div className="p-6">
+                  <div className="space-y-4">
+                    {recentCases.map((case_, index) => (
+                      <div key={index} className="group p-4 bg-white/60 rounded-xl border border-gray-100 hover:shadow-md hover:bg-white/80 transition-all duration-200 cursor-pointer">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+                              <FileText className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                              <span className="font-bold text-gray-900">{case_.id}</span>
+                              <div className="flex items-center space-x-2 mt-1">
+                                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                  case_.priority === t('cases.high') 
+                                    ? 'bg-red-100 text-red-700'
+                                    : case_.priority === t('cases.medium')
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-green-100 text-green-700'
+                                }`}>
+                                  {case_.priority}
+                                </span>
+                                <Star className="w-3 h-3 text-yellow-400" />
+                              </div>
+                            </div>
+                          </div>
+                          <span className="text-xs text-gray-500">{case_.time}</span>
+                        </div>
+                        
+                        <p className="text-sm font-medium text-gray-700 mb-2">{case_.type}</p>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs px-3 py-1 rounded-full font-bold ${
+                            case_.status === t('cases.resolved')
+                              ? 'bg-green-100 text-green-700'
+                              : case_.status === t('cases.underInvestigation')
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {case_.status}
+                          </span>
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="w-3 h-3 text-gray-400" />
+                            <MapPin className="w-3 h-3 text-gray-400" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <button 
+                    onClick={() => setActiveView('cases')}
+                    className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    {t('dashboard.viewAllCases')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <p className="text-gray-600 mt-2">
-          {t('dashboard.systemDesc')}
-        </p>
-        <div className="flex items-center space-x-6 mt-4 text-sm">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-gray-600">{t('dashboard.database')}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-gray-600">{t('dashboard.aiServices')}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-gray-600">{t('dashboard.voiceRecognition')}</span>
+
+        {/* Modern System Status */}
+        <div className="mt-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 rounded-2xl"></div>
+          <div className="relative bg-gradient-to-r from-green-400/90 to-blue-500/90 backdrop-blur-sm rounded-2xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">{t('dashboard.systemStatus')}</h3>
+                  <p className="text-white/80 mt-1">
+                    All systems operational and running smoothly
+                  </p>
+                </div>
+              </div>
+              <BarChart3 className="w-8 h-8 text-white/60" />
+            </div>
+            
+            <div className="flex items-center space-x-8 mt-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-lg"></div>
+                <span className="text-white/90 font-medium">{t('dashboard.database')}</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-lg"></div>
+                <span className="text-white/90 font-medium">{t('dashboard.aiServices')}</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-lg"></div>
+                <span className="text-white/90 font-medium">{t('dashboard.voiceRecognition')}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
