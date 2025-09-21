@@ -5,6 +5,7 @@ import { User, Shield, Settings, ArrowLeft, Eye, EyeOff, Mail, UserPlus } from '
 import { supabase } from '../lib/supabaseClient';
 import policeLogoPng from './police_logo.png';
 import backJpeg from './back.jpeg';
+import PoliceImage from './PoliceImage';
 
 interface SignUpFormProps {
   role: string;
@@ -459,6 +460,9 @@ const SignUp = () => {
           </p>
         </div>
       </div>
+      
+      {/* Police Image - Bottom Right */}
+      <PoliceImage />
     </div>
   );
 };

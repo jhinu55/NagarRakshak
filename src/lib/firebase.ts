@@ -1,6 +1,6 @@
 // Firebase configuration
 import { initializeApp } from 'firebase/app';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 // Your Firebase config object
@@ -32,7 +32,7 @@ try {
 }
 
 // Initialize Firestore
-let db;
+let db: Firestore;
 try {
   db = getFirestore(app);
   console.log('✅ Firestore initialized successfully');

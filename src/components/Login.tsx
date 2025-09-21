@@ -5,6 +5,7 @@ import { User, Shield, Settings, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import policeLogoPng from './police_logo.png';
 import backJpeg from './back.jpeg';
+import PoliceImage from './PoliceImage';
 
 interface LoginFormProps {
   role: string;
@@ -49,13 +50,13 @@ const LoginForm = ({ role, onSubmit }: LoginFormProps) => {
   const getRoleColor = () => {
     switch (role) {
       case 'citizen':
-        return 'from-blue-600 to-blue-700';
+        return 'from-yellow-500 to-yellow-600';
       case 'officer':
-        return 'from-green-600 to-green-700';
+        return 'from-orange-500 to-orange-600';
       case 'admin':
-        return 'from-purple-600 to-purple-700';
+        return 'from-red-500 to-red-600';
       default:
-        return 'from-blue-600 to-blue-700';
+        return 'from-yellow-500 to-yellow-600';
     }
   };
 
@@ -168,24 +169,24 @@ const Login = () => {
       id: 'citizen',
       name: t('userRoles.citizen'),
       icon: User,
-      color: 'from-blue-600 to-blue-700',
-      hoverColor: 'hover:from-blue-700 hover:to-blue-800',
+      color: 'from-yellow-500 to-yellow-600',
+      hoverColor: 'hover:from-yellow-600 hover:to-yellow-700',
       description: t('login.citizenDesc')
     },
     {
       id: 'officer',
       name: t('userRoles.officer'),
       icon: Shield,
-      color: 'from-green-600 to-green-700',
-      hoverColor: 'hover:from-green-700 hover:to-green-800',
+      color: 'from-orange-500 to-orange-600',
+      hoverColor: 'hover:from-orange-600 hover:to-orange-700',
       description: t('login.officerDesc')
     },
     {
       id: 'admin',
       name: t('userRoles.admin'),
       icon: Settings,
-      color: 'from-purple-600 to-purple-700',
-      hoverColor: 'hover:from-purple-700 hover:to-purple-800',
+      color: 'from-red-500 to-red-600',
+      hoverColor: 'hover:from-red-600 hover:to-red-700',
       description: t('login.adminDesc')
     }
   ];
@@ -366,6 +367,9 @@ const Login = () => {
           </p>
         </div>
       </div>
+      
+      {/* Police Image - Bottom Right */}
+      <PoliceImage />
     </div>
   );
 };

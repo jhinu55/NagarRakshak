@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
 import policeLogoPng from './police_logo.png';
 import backJpeg from './back.jpeg';
+import PoliceImage from './PoliceImage';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -95,6 +96,9 @@ const LandingPage = () => {
           </p>
         </div>
       </div>
+
+      {/* Interactive Police Image */}
+      <PoliceImage />
     </div>
   );
 };

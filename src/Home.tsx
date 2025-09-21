@@ -7,6 +7,7 @@ import OfficerPortal from './components/OfficerPortal';
 import AIAssistant from './components/AIAssistant';
 import CaseManagement from './components/CaseManagement';
 import Analytics from './components/Analytics';
+import PoliceImage from './components/PoliceImage';
 
 export type UserRole = 'citizen' | 'officer' | 'admin' | null;
 export type ActiveView = 'dashboard' | 'citizen' | 'officer' | 'cases' | 'analytics' | 'ai';
@@ -53,6 +54,9 @@ function Home() {
           userRole={userRole}
         />
       )}
+      
+      {/* Police Image - Bottom Right */}
+      <PoliceImage />
     </div>
   );
 }

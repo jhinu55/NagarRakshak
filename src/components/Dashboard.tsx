@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   FileText, 
@@ -18,9 +18,12 @@ import {
   Search,
   Filter,
   Bell,
-  Star
+  Star,
+  Loader2
 } from 'lucide-react';
 import { UserRole, ActiveView } from '../Home';
+import { officerStatsService, OfficerStats, SystemStatus } from '../lib/officerStatsService';
+import { useAuth } from '../lib/useAuth';
 
 interface DashboardProps {
   userRole: UserRole;
@@ -29,19 +32,110 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ userRole: _userRole, setActiveView }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   
-  const stats = [
-    { label: t('stats.totalCases'), value: '1,247', icon: FileText, color: 'blue', change: '+12%' },
-    { label: t('stats.activeCases'), value: '89', icon: Clock, color: 'orange', change: '+5%' },
-    { label: t('stats.resolvedCases'), value: '1,158', icon: CheckCircle, color: 'green', change: '+8%' },
-    { label: t('stats.urgentCases'), value: '12', icon: AlertTriangle, color: 'red', change: '-3%' },
-  ];
-
-  const recentCases = [
-    { id: 'FIR001', type: t('cases.theft'), status: t('cases.underInvestigation'), priority: t('cases.high'), time: '2 hours ago' },
-    { id: 'FIR002', type: t('cases.domesticDispute'), status: t('cases.resolved'), priority: t('cases.medium'), time: '4 hours ago' },
-    { id: 'FIR003', type: t('cases.trafficViolation'), status: t('cases.pending'), priority: t('cases.low'), time: '6 hours ago' },
-    { id: 'FIR004', type: t('cases.cybercrime'), status: t('cases.underInvestigation'), priority: t('cases.high'), time: '8 hours ago' },
+  // State for dynamic data
+  const [stats, setStats] = useState<OfficerStats | null>(null);
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Load dynamic data
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const officerName = user?.fullName || user?.email?.split('@')[0];
+        console.log('📊 Loading dashboard data for:', officerName);
+        
+        // Load officer stats and system status in parallel
+        const [officerStats, systemStatusData] = await Promise.all([
+          officerName ? officerStatsService.getOfficerStats(officerName) : officerStatsService.getGlobalStats(),
+          officerStatsService.getSystemStatus()
+        ]);
+        
+        setStats(officerStats);
+        setSystemStatus(systemStatusData);
+        
+        console.log('✅ Dashboard data loaded successfully');
+      } catch (err) {
+        console.error('❌ Error loading dashboard data:', err);
+        setError('Failed to load dashboard data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadDashboardData();
+  }, [user]);
+  
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mr-3" />
+            <span className="text-gray-600 text-lg">Loading dashboard...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="container mx-auto px-4 py-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-red-900 mb-2">Dashboard Error</h3>
+            <p className="text-red-700">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Prepare dynamic stats for display
+  const dynamicStats = [
+    { 
+      label: t('stats.totalCases'), 
+      value: stats?.totalCases.toString() || '0', 
+      icon: FileText, 
+      color: 'blue', 
+      change: '+' + Math.round((stats?.thisWeekProgress || 0) / 10) + '%' 
+    },
+    { 
+      label: t('stats.activeCases'), 
+      value: stats?.activeCases.toString() || '0', 
+      icon: Clock, 
+      color: 'orange', 
+      change: '+' + (stats?.todaysNewCases || 0).toString() + '%'
+    },
+    { 
+      label: t('stats.resolvedCases'), 
+      value: stats?.resolvedCases.toString() || '0', 
+      icon: CheckCircle, 
+      color: 'green', 
+      change: '+' + (stats?.completionRate || 0) + '%' 
+    },
+    { 
+      label: t('stats.urgentCases'), 
+      value: stats?.urgentCases.toString() || '0', 
+      icon: AlertTriangle, 
+      color: 'red', 
+      change: stats?.urgentCases && stats.urgentCases > 0 ? '+' + stats.urgentCases + '%' : '0%'
+    },
   ];
 
   const quickActions = [
@@ -103,7 +197,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole: _userRole, setActiveVie
 
         {/* Modern Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => {
+          {dynamicStats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
               <div key={index} className="group relative overflow-hidden">
@@ -183,51 +277,59 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole: _userRole, setActiveVie
               <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl border border-white/50">
                 <div className="p-6">
                   <div className="space-y-4">
-                    {recentCases.map((case_, index) => (
-                      <div key={index} className="group p-4 bg-white/60 rounded-xl border border-gray-100 hover:shadow-md hover:bg-white/80 transition-all duration-200 cursor-pointer">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
-                              <FileText className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                              <span className="font-bold text-gray-900">{case_.id}</span>
-                              <div className="flex items-center space-x-2 mt-1">
-                                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                  case_.priority === t('cases.high') 
-                                    ? 'bg-red-100 text-red-700'
-                                    : case_.priority === t('cases.medium')
-                                    ? 'bg-yellow-100 text-yellow-700'
-                                    : 'bg-green-100 text-green-700'
-                                }`}>
-                                  {case_.priority}
-                                </span>
-                                <Star className="w-3 h-3 text-yellow-400" />
+                    {stats?.recentCases && stats.recentCases.length > 0 ? (
+                      stats.recentCases.map((case_, index) => (
+                        <div key={index} className="group p-4 bg-white/60 rounded-xl border border-gray-100 hover:shadow-md hover:bg-white/80 transition-all duration-200 cursor-pointer">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+                                <FileText className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <span className="font-bold text-gray-900">{case_.id}</span>
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                    case_.priority === 'High' 
+                                      ? 'bg-red-100 text-red-700'
+                                      : case_.priority === 'Medium'
+                                      ? 'bg-yellow-100 text-yellow-700'
+                                      : 'bg-green-100 text-green-700'
+                                  }`}>
+                                    {case_.priority}
+                                  </span>
+                                  <Star className="w-3 h-3 text-yellow-400" />
+                                </div>
                               </div>
                             </div>
+                            <span className="text-xs text-gray-500">{case_.lastUpdate}</span>
                           </div>
-                          <span className="text-xs text-gray-500">{case_.time}</span>
-                        </div>
-                        
-                        <p className="text-sm font-medium text-gray-700 mb-2">{case_.type}</p>
-                        
-                        <div className="flex items-center justify-between">
-                          <span className={`text-xs px-3 py-1 rounded-full font-bold ${
-                            case_.status === t('cases.resolved')
-                              ? 'bg-green-100 text-green-700'
-                              : case_.status === t('cases.underInvestigation')
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'bg-gray-100 text-gray-700'
-                          }`}>
-                            {case_.status}
-                          </span>
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-3 h-3 text-gray-400" />
-                            <MapPin className="w-3 h-3 text-gray-400" />
+                          
+                          <p className="text-sm font-medium text-gray-700 mb-2">{case_.type}</p>
+                          
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs px-3 py-1 rounded-full font-bold ${
+                              case_.status === 'Resolved'
+                                ? 'bg-green-100 text-green-700'
+                                : case_.status === 'Under Investigation'
+                                ? 'bg-blue-100 text-blue-700'
+                                : 'bg-gray-100 text-gray-700'
+                            }`}>
+                              {case_.status}
+                            </span>
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="w-3 h-3 text-gray-400" />
+                              <MapPin className="w-3 h-3 text-gray-400" />
+                            </div>
                           </div>
                         </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No Recent Cases</h3>
+                        <p className="text-gray-600">No cases have been assigned recently.</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                   
                   <button 
@@ -254,7 +356,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole: _userRole, setActiveVie
                 <div>
                   <h3 className="text-xl font-bold">{t('dashboard.systemStatus')}</h3>
                   <p className="text-white/80 mt-1">
-                    All systems operational and running smoothly
+                    {systemStatus ? 'All systems operational and running smoothly' : 'Loading system status...'}
                   </p>
                 </div>
               </div>
@@ -263,17 +365,32 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole: _userRole, setActiveVie
             
             <div className="flex items-center space-x-8 mt-6">
               <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-lg"></div>
+                <div className={`w-3 h-3 rounded-full animate-pulse shadow-lg ${
+                  systemStatus?.database === 'online' ? 'bg-green-300' : 
+                  systemStatus?.database === 'offline' ? 'bg-red-300' : 'bg-yellow-300'
+                }`}></div>
                 <span className="text-white/90 font-medium">{t('dashboard.database')}</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-lg"></div>
+                <div className={`w-3 h-3 rounded-full animate-pulse shadow-lg ${
+                  systemStatus?.aiServices === 'online' ? 'bg-green-300' : 
+                  systemStatus?.aiServices === 'offline' ? 'bg-red-300' : 'bg-yellow-300'
+                }`}></div>
                 <span className="text-white/90 font-medium">{t('dashboard.aiServices')}</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-lg"></div>
+                <div className={`w-3 h-3 rounded-full animate-pulse shadow-lg ${
+                  systemStatus?.voiceRecognition === 'online' ? 'bg-green-300' : 
+                  systemStatus?.voiceRecognition === 'offline' ? 'bg-red-300' : 'bg-yellow-300'
+                }`}></div>
                 <span className="text-white/90 font-medium">{t('dashboard.voiceRecognition')}</span>
               </div>
+              {systemStatus?.uptime && (
+                <div className="flex items-center space-x-3">
+                  <Clock className="w-4 h-4 text-white/70" />
+                  <span className="text-white/90 font-medium">Uptime: {systemStatus.uptime}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
