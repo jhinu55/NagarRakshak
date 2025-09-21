@@ -434,5 +434,33 @@ export const firestoreService = {
       console.error('❌ Error extracting officer names from database:', error);
       throw new Error('Failed to extract officer names from database');
     }
+  },
+
+  async updateCaseStatus(caseId: string, status: string): Promise<void> {
+    try {
+      console.log('🔄 Updating case status in Firestore:', caseId, 'to', status);
+      
+      // Find the document by fir_number
+      const casesRef = collection(db, COLLECTION_NAME);
+      const q = query(casesRef, where('fir_number', '==', caseId));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        throw new Error(`Case ${caseId} not found in Firestore`);
+      }
+      
+      const docToUpdate = querySnapshot.docs[0];
+      
+      // Update the case status
+      await updateDoc(docToUpdate.ref, {
+        status: status,
+        updated_at: new Date()
+      });
+      
+      console.log(`✅ Case ${caseId} status updated to ${status}`);
+    } catch (error) {
+      console.error('❌ Error updating case status:', error);
+      throw error;
+    }
   }
 };

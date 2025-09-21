@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firestore Debug Test</title>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js"></script>
+</head>
+<body>
+    <h1>Firestore Data Test</h1>
+    <div id="status">Loading...</div>
+    <div id="data"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js';
+        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCf0gp5HKSrV5h2x8j5UtdCjIGLmbUW4sE",
+            authDomain: "nagarrakshak-d7088.firebaseapp.com",
+            projectId: "nagarrakshak-d7088",
+            storageBucket: "nagarrakshak-d7088.firebasestorage.app",
+            messagingSenderId: "891986905846",
+            appId: "1:891986905846:web:ac2f066bb4ae6aa5b89aa9",
+            measurementId: "G-QLVM6S1CXN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function testFirestore() {
+            try {
+                console.log('Testing Firestore connection...');
+                document.getElementById('status').textContent = 'Testing Firestore...';
+                
+                const firsRef = collection(db, 'firs');
+                const snapshot = await getDocs(firsRef);
+                
+                console.log(`Found ${snapshot.size} documents in 'firs' collection`);
+                document.getElementById('status').textContent = `Found ${snapshot.size} documents`;
+                
+                const docs = [];
+                snapshot.forEach((doc) => {
+                    docs.push({ id: doc.id, ...doc.data() });
+                });
+                
+                document.getElementById('data').innerHTML = `
+                    <h2>Firestore Documents (${docs.length})</h2>
+                    <pre>${JSON.stringify(docs.slice(0, 3), null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('status').textContent = `Error: ${error.message}`;
+                document.getElementById('data').textContent = error.stack;
+            }
+        }
+
+        testFirestore();
+    </script>
+</body>
+</html>

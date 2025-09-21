@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
+import AdminDashboard from './components/AdminDashboard';
 import CitizenPortal from './components/CitizenPortal';
 import OfficerPortal from './components/OfficerPortal';
 import CaseManagement from './components/CaseManagement';
@@ -32,7 +33,10 @@ function Home() {
       case 'analytics':
         return <Analytics />;
       default:
-        return <Dashboard userRole={currentUserRole} setActiveView={setActiveView} />;
+        // Use AdminDashboard for admin users, regular Dashboard for others
+        return currentUserRole === 'admin' 
+          ? <AdminDashboard /> 
+          : <Dashboard userRole={currentUserRole} setActiveView={setActiveView} />;
     }
   };
 
