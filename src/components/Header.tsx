@@ -6,13 +6,13 @@ import {
   User, 
   Settings, 
   LogOut,
-  Bot,
   Home,
   FileText,
   BarChart3
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { UserRole, ActiveView } from '../Home';
+import { useAuth } from '../lib/useAuth';
 import policeLogoPng from './police_logo.png';
 
 interface HeaderProps {
@@ -20,27 +20,35 @@ interface HeaderProps {
   setUserRole: (role: UserRole) => void;
   activeView: ActiveView;
   setActiveView: (view: ActiveView) => void;
-  setIsAIOpen: (open: boolean) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
   userRole, 
   setUserRole, 
   activeView, 
-  setActiveView,
-  setIsAIOpen 
+  setActiveView 
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { t } = useTranslation();
+  const { user } = useAuth();
 
-  const navigationItems = [
-    { id: 'dashboard', label: t('navigation.dashboard'), icon: Home },
-    { id: 'citizen', label: t('navigation.citizenPortal'), icon: User },
-    { id: 'officer', label: t('navigation.officerPortal'), icon: Shield },
-    { id: 'cases', label: t('navigation.caseManagement'), icon: FileText },
-    { id: 'analytics', label: t('navigation.analytics'), icon: BarChart3 },
-  ];
+  // Get role-appropriate navigation items
+  const getNavigationItems = () => {
+    const userRole = user?.role || 'citizen';
+    
+    const allItems = [
+      { id: 'dashboard', label: t('navigation.dashboard'), icon: Home, roles: ['citizen', 'officer', 'admin'] },
+      { id: 'citizen', label: t('navigation.citizenPortal'), icon: User, roles: ['citizen'] },
+      { id: 'officer', label: t('navigation.officerPortal'), icon: Shield, roles: ['officer', 'admin'] },
+      { id: 'cases', label: userRole === 'citizen' ? 'My Complaints' : t('navigation.caseManagement'), icon: FileText, roles: ['citizen', 'officer', 'admin'] },
+      { id: 'analytics', label: t('navigation.analytics'), icon: BarChart3, roles: ['officer', 'admin'] },
+    ];
+    
+    return allItems.filter(item => item.roles.includes(userRole));
+  };
+
+  const navigationItems = getNavigationItems();
 
   const handleRoleSelect = (role: UserRole) => {
     setUserRole(role);
@@ -94,15 +102,6 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
-            {/* AI Assistant Button */}
-            <button
-              onClick={() => setIsAIOpen(true)}
-              className="goa-ai-gradient text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center space-x-2"
-            >
-              <Bot className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('navigation.aiAssistant')}</span>
-            </button>
-
             {/* User Menu */}
             <div className="relative">
               <button

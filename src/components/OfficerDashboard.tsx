@@ -4,19 +4,18 @@ import Dashboard from './Dashboard';
 import CaseManagement from './CaseManagement';
 import Analytics from './Analytics';
 import OfficerPortal from './OfficerPortal';
-import CitizenPortal from './CitizenPortal';
-import AIAssistant from './AIAssistant';
 import { officerProfileService, OfficerProfile, RolePermissions } from '../lib/officerProfileService';
 import { menuConfigService, MenuItem } from '../lib/menuConfigService';
-import { Loader2, AlertTriangle, Bell } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 import PoliceImage from './PoliceImage';
+import { useNavigate } from 'react-router-dom';
 
-export type ActiveView = 'dashboard' | 'citizen' | 'officer' | 'cases' | 'analytics' | 'ai';
+export type ActiveView = 'dashboard' | 'officer' | 'cases' | 'analytics' | 'emergency';
 
 const OfficerDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [activeView, setActiveView] = useState<ActiveView>('dashboard');
-  const [isAIOpen, setIsAIOpen] = useState(false);
   const [officerProfile, setOfficerProfile] = useState<OfficerProfile | null>(null);
   const [permissions, setPermissions] = useState<RolePermissions | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,6 +98,15 @@ const OfficerDashboard: React.FC = () => {
 
   const officerMenuItems = getOfficerMenuItems();
 
+  // Handle menu item clicks
+  const handleMenuClick = (itemId: string) => {
+    if (itemId === 'emergency') {
+      navigate('/emergency-dashboard');
+      return;
+    }
+    setActiveView(itemId as ActiveView);
+  };
+
   // Show loading state while loading officer data
   if (loading) {
     return (
@@ -138,10 +146,13 @@ const OfficerDashboard: React.FC = () => {
         return <OfficerPortal />;
       case 'analytics':
         return <Analytics />;
-      case 'citizen':
-        return <CitizenPortal />;
       default:
-        return <Dashboard userRole="officer" setActiveView={setActiveView} />;
+        return <Dashboard userRole="officer" setActiveView={(view) => {
+          // Only handle views that exist in our ActiveView type
+          if (view === 'officer' || view === 'cases' || view === 'analytics') {
+            setActiveView(view);
+          }
+        }} />;
     }
   };
 
@@ -169,7 +180,7 @@ const OfficerDashboard: React.FC = () => {
               {officerMenuItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setActiveView(item.id as ActiveView)}
+                  onClick={() => handleMenuClick(item.id)}
                   className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                     activeView === item.id
                       ? 'bg-blue-100 text-blue-700'
@@ -193,15 +204,6 @@ const OfficerDashboard: React.FC = () => {
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
-              {/* AI Assistant Button */}
-              <button
-                onClick={() => setIsAIOpen(true)}
-                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                title="AI Assistant"
-              >
-                🤖
-              </button>
-
               {/* User Profile */}
               <div className="flex items-center space-x-3">
               <div className="hidden md:block text-right">
@@ -245,7 +247,7 @@ const OfficerDashboard: React.FC = () => {
               {officerMenuItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setActiveView(item.id as ActiveView)}
+                  onClick={() => handleMenuClick(item.id)}
                   className={`relative flex-shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition-colors duration-200 ${
                     activeView === item.id
                       ? 'bg-blue-100 text-blue-700'
@@ -308,15 +310,6 @@ const OfficerDashboard: React.FC = () => {
           {renderActiveView()}
         </div>
       </main>
-
-      {/* AI Assistant Overlay */}
-      {isAIOpen && (
-        <AIAssistant 
-          isOpen={isAIOpen} 
-          onClose={() => setIsAIOpen(false)}
-          userRole="officer"
-        />
-      )}
       
       {/* Police Image - Bottom Right */}
       <PoliceImage />

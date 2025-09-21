@@ -66,12 +66,6 @@ class MenuConfigService {
         description: 'Performance metrics and insights'
       },
       {
-        id: 'citizen',
-        label: 'Citizen Services',
-        icon: '👥',
-        description: 'Handle citizen complaints and services'
-      },
-      {
         id: 'admin',
         label: 'Administration',
         icon: '⚙️',
@@ -94,13 +88,6 @@ class MenuConfigService {
         permission: 'canViewAnalytics',
         minRank: 'Head Constable',
         description: 'Generate and view reports'
-      },
-      {
-        id: 'patrol',
-        label: 'Patrol Management',
-        icon: '🚔',
-        departments: ['Traffic', 'Patrol', 'General'],
-        description: 'Manage patrol routes and assignments'
       },
       {
         id: 'investigation',
@@ -155,7 +142,7 @@ class MenuConfigService {
       {
         title: 'Core Functions',
         items: items.filter(item => 
-          ['dashboard', 'cases', 'officer', 'citizen'].includes(item.id)
+          ['dashboard', 'cases', 'officer'].includes(item.id)
         )
       },
       {
@@ -167,7 +154,7 @@ class MenuConfigService {
       {
         title: 'Department Specific',
         items: items.filter(item => 
-          ['patrol', 'investigation', 'traffic', 'cybercrime', 'forensics', 'emergency'].includes(item.id)
+          ['investigation', 'traffic', 'cybercrime', 'forensics', 'emergency'].includes(item.id)
         )
       },
       {

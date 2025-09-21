@@ -5,6 +5,8 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Home from './Home';
 import OfficerDashboard from './components/OfficerDashboard';
+import EmergencyDashboard from './components/EmergencyDashboard';
+import CitizenDashboard from './components/CitizenDashboard';
 import BasicTest from './components/BasicTest';
 import UserSetupRunner from './components/UserSetupRunner';
 import RoleDemo from './components/RoleDemo';
@@ -28,6 +30,11 @@ function App() {
               <OfficerDashboard />
             </ProtectedRoute>
           } />
+          <Route path="/emergency-dashboard" element={
+            <ProtectedRoute requiredRole="officer">
+              <EmergencyDashboard />
+            </ProtectedRoute>
+          } />
           <Route path="/admin-dashboard" element={
             <ProtectedRoute requiredRole="admin">
               <Home />
@@ -35,7 +42,7 @@ function App() {
           } />
           <Route path="/citizen-dashboard" element={
             <ProtectedRoute requiredRole="citizen">
-              <Home />
+              <CitizenDashboard />
             </ProtectedRoute>
           } />
           <Route path="/role-demo" element={

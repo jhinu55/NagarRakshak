@@ -7,7 +7,6 @@ import {
   Clock,
   TrendingUp,
   Shield,
-  Bot,
   ArrowRight,
   Users,
   Calendar,
@@ -140,13 +139,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole: _userRole, setActiveVie
 
   const quickActions = [
     { 
-      title: t('actions.fileComplaint'), 
-      description: t('actions.fileComplaintDesc'),
-      icon: FileText, 
-      action: () => setActiveView('citizen'),
-      color: 'blue'
-    },
-    { 
       title: t('actions.officerDashboard'), 
       description: t('actions.officerDashboardDesc'),
       icon: Shield, 
@@ -159,13 +151,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole: _userRole, setActiveVie
       icon: TrendingUp, 
       action: () => setActiveView('analytics'),
       color: 'purple'
-    },
-    { 
-      title: t('actions.aiAssistant'), 
-      description: t('actions.aiAssistantDesc'),
-      icon: Bot, 
-      action: () => {},
-      color: 'cyan'
     },
   ];
 

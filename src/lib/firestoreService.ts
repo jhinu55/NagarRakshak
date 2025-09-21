@@ -124,8 +124,8 @@ function generatePriority(incidentType: string): string {
 // Generate assigned officer based on FIR number
 function generateAssignedOfficer(firNumber: string): string {
   const officers = [
-    'Officer Singh', 'Officer Patel', 'Officer Kumar', 'Officer Sharma', 
-    'Officer Verma', 'Officer Gupta', 'Officer Yadav', 'Officer Joshi'
+    'Rajesh Singh', 'Priya Patel', 'Amit Kumar', 'Sunita Sharma', 
+    'Vikram Verma', 'Anjali Gupta', 'Rohit Yadav', 'Kavita Joshi'
   ];
   
   const index = parseInt(firNumber.slice(-2)) % officers.length;
